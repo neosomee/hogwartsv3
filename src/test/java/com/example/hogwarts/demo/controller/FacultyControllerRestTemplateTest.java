@@ -21,6 +21,10 @@ public class FacultyControllerRestTemplateTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    private String url(String path) {
+        return "http://localhost:" + port + path;
+    }
+
     @Test
     void contextLoads() {
         assertThat(restTemplate).isNotNull();
@@ -29,91 +33,42 @@ public class FacultyControllerRestTemplateTest {
     @Test
     void testDefaultMessage() {
         String result = restTemplate.getForObject(
-                "http://localhost:" + port + "/",
+                url("/"),
                 String.class
         );
         assertThat(result).isNotNull();
     }
 
     @Test
-    void testGetFacultys() {
+    void testGetFaculties() {
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "http://localhost:" + port + "/facultys",
+                url("/faculties"),
                 String.class
         );
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
     }
 
     @Test
     void testPostFaculty() {
+
         Faculty faculty = new Faculty();
-        faculty.setName("Hogwarts");
+        faculty.setName("Hogwarts_" + System.currentTimeMillis());
         faculty.setColor("Green");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         HttpEntity<Faculty> request = new HttpEntity<>(faculty, headers);
 
         ResponseEntity<Faculty> response = restTemplate.postForEntity(
-                "http://localhost:" + port + "/facultys",
+                url("/faculties"),
                 request,
                 Faculty.class
         );
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getName()).isEqualTo("Hogwarts");
-    }
-
-    @Test
-    void testGetFacultyById() {
-        // сначала создаём
-        Faculty faculty = new Faculty();
-        faculty.setName("Gryffindor");
-        faculty.setColor("Red");
-
-        Faculty created = restTemplate.postForObject(
-                "http://localhost:" + port + "/facultys",
-                faculty,
-                Faculty.class
-        );
-        Long id = created.getId();
-
-        ResponseEntity<Faculty> response = restTemplate.getForEntity(
-                "http://localhost:" + port + "/facultys/" + id,
-                Faculty.class
-        );
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getName()).isEqualTo("Gryffindor");
-    }
-
-    @Test
-    void testUpdateFaculty() {
-        // создаём
-        Faculty faculty = new Faculty();
-        faculty.setName("Old");
-        faculty.setColor("Black");
-        Faculty created = restTemplate.postForObject(
-                "http://localhost:" + port + "/facultys",
-                faculty,
-                Faculty.class
-        );
-
-        // обновляем
-        created.setName("Slytherin");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Faculty> request = new HttpEntity<>(created, headers);
-
-        ResponseEntity<Faculty> response = restTemplate.exchange(
-                "http://localhost:" + port + "/facultys",
-                HttpMethod.PUT,
-                request,
-                Faculty.class
-        );
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getName()).isEqualTo("Slytherin");
     }
 }

@@ -15,7 +15,10 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FacultyController.class)
@@ -32,6 +35,7 @@ class FacultyControllerWebMvcTest {
 
     @Test
     void saveFacultyTest() throws Exception {
+
         final String name = "Slytherin";
         final String color = "Green";
         final long id = 1;
@@ -44,9 +48,10 @@ class FacultyControllerWebMvcTest {
         faculty.setId(id);
         faculty.setName(name);
         faculty.setColor(color);
+
         when(facultyService.createFaculty(any(Faculty.class))).thenReturn(faculty);
 
-        mockMvc.perform(post("/facultys")
+        mockMvc.perform(post("/faculties")
                         .content(jsonObject.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -58,6 +63,7 @@ class FacultyControllerWebMvcTest {
 
     @Test
     void getFacultyTest() throws Exception {
+
         final String name = "Slytherin";
         final String color = "Green";
         final long id = 1;
@@ -69,7 +75,7 @@ class FacultyControllerWebMvcTest {
 
         when(facultyService.findFaculty(id)).thenReturn(faculty);
 
-        mockMvc.perform(get("/facultys/1"))
+        mockMvc.perform(get("/faculties/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value(name))
@@ -78,14 +84,16 @@ class FacultyControllerWebMvcTest {
 
     @Test
     void getAllFacultiesTest() throws Exception {
+
         when(facultyService.getAllFaculty()).thenReturn(List.of());
 
-        mockMvc.perform(get("/facultys"))
+        mockMvc.perform(get("/faculties"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void editFacultyTest() throws Exception {
+
         final String name = "Gryffindor";
         final String color = "Red";
         final long id = 1;
@@ -102,7 +110,7 @@ class FacultyControllerWebMvcTest {
 
         when(facultyService.editFaculty(any(Faculty.class))).thenReturn(faculty);
 
-        mockMvc.perform(put("/facultys")
+        mockMvc.perform(put("/faculties")
                         .content(jsonObject.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -110,7 +118,8 @@ class FacultyControllerWebMvcTest {
 
     @Test
     void deleteFacultyTest() throws Exception {
-        mockMvc.perform(delete("/facultys/1"))
+
+        mockMvc.perform(delete("/faculties/1"))
                 .andExpect(status().isOk());
     }
 }
